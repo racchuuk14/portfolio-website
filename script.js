@@ -1,71 +1,89 @@
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+const API_KEY = "46f87a3d61e5029d6555757fa4f71caa";
 
-function saveTasks(){
-localStorage.setItem("tasks", JSON.stringify(tasks));
+function getWeather(){
+
+const city = document.getElementById("cityInput").value;
+
+if(city === ""){
+alert("Please enter city name");
+return;
 }
 
-function addTask(){
+const currentURL =
+`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`;
 
-let input = document.getElementById("taskInput");
-let text = input.value.trim();
+const forecastURL =
+`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`;
 
-if(text === "") return;
+fetch(currentURL)
+.then(response => {
 
-tasks.push({
-text: text,
-completed: false
+if(!response.ok){
+throw new Error("City not found");
+}
+
+return response.json();
+
+})
+.then(data => {
+
+displayCurrentWeather(data);
+
+})
+.catch(error => {
+
+document.getElementById("weatherResult").innerHTML =
+`<p style="color:red;">${error.message}</p>`;
+
 });
 
-input.value = "";
 
-saveTasks();
-displayTasks();
+fetch(forecastURL)
+.then(response => response.json())
+.then(data => {
+
+displayForecast(data);
+
+});
+
 }
 
-function displayTasks(filter = "all"){
+function displayCurrentWeather(data){
 
-let list = document.getElementById("taskList");
-list.innerHTML = "";
-
-tasks.forEach((task,index)=>{
-
-if(filter === "active" && task.completed) return;
-if(filter === "completed" && !task.completed) return;
-
-let li = document.createElement("li");
-
-li.innerHTML = `
-<span onclick="toggleTask(${index})" class="${task.completed ? 'completed' : ''}">
-${task.text}
-</span>
-
-<button onclick="deleteTask(${index})">Delete</button>
+const weatherHTML = `
+<h2>${data.name}</h2>
+<img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png">
+<p>Temperature: ${data.main.temp}°C</p>
+<p>Weather: ${data.weather[0].description}</p>
+<p>Humidity: ${data.main.humidity}%</p>
 `;
 
-list.appendChild(li);
+document.getElementById("weatherResult").innerHTML = weatherHTML;
 
-});
 }
 
-function toggleTask(index){
+function displayForecast(data){
 
-tasks[index].completed = !tasks[index].completed;
+let forecastHTML = "";
 
-saveTasks();
-displayTasks();
+for(let i=0;i<5;i++){
+
+let day = data.list[i*8];
+
+forecastHTML += `
+<div class="forecast-day">
+
+<p>${day.dt_txt.split(" ")[0]}</p>
+
+<img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png">
+
+<p>${day.main.temp}°C</p>
+
+</div>
+`;
+
 }
 
-function deleteTask(index){
+document.getElementById("forecast").innerHTML = forecastHTML;
 
-tasks.splice(index,1);
-
-saveTasks();
-displayTasks();
 }
-
-function filterTasks(type){
-
-displayTasks(type);
-}
-
-displayTasks();
