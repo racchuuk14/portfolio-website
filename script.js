@@ -1,89 +1,112 @@
-const API_KEY = "46f87a3d61e5029d6555757fa4f71caa";
+const products=[
 
-function getWeather(){
+{ id:1, name:"Laptop", category:"electronics", price:800 },
 
-const city = document.getElementById("cityInput").value;
+{ id:2, name:"Headphones", category:"electronics", price:40 },
 
-if(city === ""){
-alert("Please enter city name");
-return;
-}
+{ id:3, name:"T-Shirt", category:"clothing", price:25 },
 
-const currentURL =
-`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`;
+{ id:4, name:"Jeans", category:"clothing", price:60 },
 
-const forecastURL =
-`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${API_KEY}`;
+{ id:5, name:"JavaScript Book", category:"books", price:30 },
 
-fetch(currentURL)
-.then(response => {
+{ id:6, name:"Laptop Bag", category:"electronics", price:70 }
 
-if(!response.ok){
-throw new Error("City not found");
-}
+];
 
-return response.json();
+let cart=JSON.parse(localStorage.getItem("cart")) || [];
 
-})
-.then(data => {
+function displayProducts(list){
 
-displayCurrentWeather(data);
+const grid=document.getElementById("productGrid");
 
-})
-.catch(error => {
+grid.innerHTML="";
 
-document.getElementById("weatherResult").innerHTML =
-`<p style="color:red;">${error.message}</p>`;
+list.forEach(product=>{
 
-});
+grid.innerHTML+=`
 
+<div class="product">
 
-fetch(forecastURL)
-.then(response => response.json())
-.then(data => {
+<h3>${product.name}</h3>
 
-displayForecast(data);
+<p>Category: ${product.category}</p>
 
-});
+<p>Price: $${product.price}</p>
 
-}
-
-function displayCurrentWeather(data){
-
-const weatherHTML = `
-<h2>${data.name}</h2>
-<img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png">
-<p>Temperature: ${data.main.temp}°C</p>
-<p>Weather: ${data.weather[0].description}</p>
-<p>Humidity: ${data.main.humidity}%</p>
-`;
-
-document.getElementById("weatherResult").innerHTML = weatherHTML;
-
-}
-
-function displayForecast(data){
-
-let forecastHTML = "";
-
-for(let i=0;i<5;i++){
-
-let day = data.list[i*8];
-
-forecastHTML += `
-<div class="forecast-day">
-
-<p>${day.dt_txt.split(" ")[0]}</p>
-
-<img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png">
-
-<p>${day.main.temp}°C</p>
+<button onclick="addToCart(${product.id})">Add to Cart</button>
 
 </div>
+
 `;
 
-}
-
-document.getElementById("forecast").innerHTML = forecastHTML;
+});
 
 }
+
+function filterProducts(){
+
+let category=document.getElementById("categoryFilter").value;
+
+let price=document.getElementById("priceFilter").value;
+
+let filtered=products.filter(p=>{
+
+let categoryMatch=(category==="all" || p.category===category);
+
+let priceMatch=true;
+
+if(price==="low") priceMatch=p.price<50;
+
+if(price==="mid") priceMatch=p.price>=50 && p.price<=100;
+
+if(price==="high") priceMatch=p.price>100;
+
+return categoryMatch && priceMatch;
+
+});
+
+displayProducts(filtered);
+
+}
+
+function addToCart(id){
+
+let product=products.find(p=>p.id===id);
+
+cart.push(product);
+
+localStorage.setItem("cart",JSON.stringify(cart));
+
+displayCart();
+
+}
+
+function displayCart(){
+
+const cartList=document.getElementById("cart");
+
+cartList.innerHTML="";
+
+let total=0;
+
+cart.forEach(item=>{
+
+cartList.innerHTML+=`<li>${item.name} - $${item.price}</li>`;
+
+total+=item.price;
+
+});
+
+let tax=total*0.1;
+
+let finalTotal=total+tax;
+
+document.getElementById("total").innerText=
+`Subtotal: $${total.toFixed(2)} | Tax: $${tax.toFixed(2)} | Total: $${finalTotal.toFixed(2)}`;
+
+}
+
+displayProducts(products);
+
+displayCart();

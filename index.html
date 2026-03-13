@@ -1,36 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
 
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Weather Dashboard</title>
-
+<title>Product Catalog</title>
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
-<div class="container">
+<h1>Product Catalog</h1>
 
-<h1>Weather Dashboard</h1>
+<div class="filters">
 
-<div class="search-box">
-<input type="text" id="cityInput" placeholder="Enter city name">
-<button onclick="getWeather()">Search</button>
+<select id="categoryFilter" onchange="filterProducts()">
+<option value="all">All Categories</option>
+<option value="electronics">Electronics</option>
+<option value="clothing">Clothing</option>
+<option value="books">Books</option>
+</select>
+
+<select id="priceFilter" onchange="filterProducts()">
+<option value="all">All Prices</option>
+<option value="low">Below $50</option>
+<option value="mid">$50 - $100</option>
+<option value="high">Above $100</option>
+</select>
+
 </div>
 
-<div id="weatherResult"></div>
+<div id="productGrid" class="grid"></div>
 
-<h2>5 Day Forecast</h2>
+<h2>Shopping Cart</h2>
 
-<div id="forecast"></div>
+<ul id="cart"></ul>
 
-</div>
+<p id="total"></p>
 
 <script src="script.js"></script>
 
 </body>
+
 </html>
