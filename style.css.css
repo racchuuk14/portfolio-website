@@ -1,0 +1,26 @@
+body{
+font-family: Arial;
+margin:0;
+text-align:center;
+}
+
+header{
+background:green;
+color:white;
+padding:40px;
+}
+
+section{
+padding:30px;
+}
+
+h2{
+color:green;
+}
+
+.profile-img{
+width:150px;
+height:150px;
+border-radius:50%;
+margin-top:20px;
+}
